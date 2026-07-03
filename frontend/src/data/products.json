@@ -1,0 +1,62 @@
+[
+  {
+    "id": "31",
+    "title": "Farm Chicken",
+    "price": "650.00",
+    "category": "Chicken",
+    "description": "Healthy country chicken raised naturally with traditional farming methods.",
+    "image": "chicken.jpg",
+    "location": "Parmankeni",
+    "created_at": "2026-05-19 22:59:06"
+  },
+  {
+    "id": "30",
+    "title": "Fresh Cow Milk",
+    "price": "70.00",
+    "category": "Milk",
+    "description": "Pure village cow milk collected fresh every morning.",
+    "image": "cow-milk.jpg",
+    "location": "Parmankeni",
+    "created_at": "2026-05-19 22:59:06"
+  },
+  {
+    "id": "29",
+    "title": "Goat Manure",
+    "price": "450.00",
+    "category": "Organic Fertilizer",
+    "description": "Organic goat manure suitable for natural farming.",
+    "image": "goat-manure.jpg",
+    "location": "Parmankeni",
+    "created_at": "2026-05-19 22:59:06"
+  },
+  {
+    "id": "28",
+    "title": "Cow Manure",
+    "price": "350.00",
+    "category": "Organic Fertilizer",
+    "description": "Natural cow manure improving soil fertility.",
+    "image": "cow-manure.jpg",
+    "location": "Parmankeni",
+    "created_at": "2026-05-19 22:59:06"
+  },
+  {
+    "id": "27",
+    "title": "Fresh Coconuts",
+    "price": "45.00",
+    "category": "Coconut",
+    "description": "Fresh farm coconuts directly from our coconut trees.",
+    "image": "coconut.jpg",
+    "location": "Parmankeni",
+    "created_at": "2026-05-19 22:59:06"
+  },
+  {
+    "id": "26",
+    "title": "Country Eggs",
+    "price": "12.00",
+    "category": "Eggs",
+    "description": "Healthy organic country eggs from free-range hens.",
+    "image": "egg.jpg",
+    "location": "Parmankeni",
+    "created_at": "2026-05-19 22:59:06"
+  }
+]
