@@ -1,6 +1,4 @@
 import { useState } from "react";
-
-
 import {
   FaFacebookF,
   FaInstagram,
@@ -8,8 +6,9 @@ import {
   FaMapMarkerAlt,
   FaLeaf,
 } from "react-icons/fa";
-const API = import.meta.env.VITE_API_URL;
 
+const API = import.meta.env.VITE_API_URL;
+const API_KEY = import.meta.env.VITE_API_KEY || "localfarm-admin-key";
 
 function Contact() {
 
@@ -46,17 +45,17 @@ function Contact() {
     try {
 
      const response = await fetch(
-  `${API}/contacts`,
-  {
-    method: "POST",
-    mode: "cors",
-    headers: {
-      "Content-Type": "application/json",
-      "X-API-Key": API || "localfarm-admin-key",
-    },
-    body: JSON.stringify(formData),
-  }
-);
+      `${API}/contacts`,
+      {
+        method: "POST",
+        mode: "cors",
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-Key": API_KEY,
+        },
+        body: JSON.stringify(formData),
+      }
+    );
 
       const data = await response.json();
 
