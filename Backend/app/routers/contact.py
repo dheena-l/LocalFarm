@@ -6,7 +6,6 @@ from app.database import get_db
 from app.models import Contact
 from app.schemas import ContactSchema
 from app.email_service import send_contact_email
-from app.main import require_api_key
 import logging
 
 logger = logging.getLogger(__name__)
@@ -18,7 +17,6 @@ router = APIRouter()
 def create_contact(
     contact: ContactSchema,
     db: Session = Depends(get_db),
-    _: str = Depends(require_api_key),
 ):
 
     new_contact = Contact(

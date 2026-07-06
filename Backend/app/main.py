@@ -5,7 +5,6 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-import logging
 
 from app.database import Base
 from app.database import engine
@@ -16,10 +15,10 @@ Base.metadata.create_all(
 
 load_dotenv()
 
-API_KEY = os.getenv("LOCALFARM_API_KEY", "localfarm-admin-key")
+API_KEY = os.getenv("LOCALFARM_API_KEY") or os.getenv("VITE_API_KEY") or "localfarm-admin-key"
 FALLBACK_API_KEY = os.getenv("FRONTEND_API_KEY_FALLBACK", "localfarm-admin-key")
 
-# Configure simple logging for debugging API key issues
+# Configure logging for API key diagnostics
 logger = logging.getLogger(__name__)
 if not logger.handlers:
     logging.basicConfig(level=logging.INFO)
