@@ -51,7 +51,7 @@ function Contact() {
     mode: "cors",
     headers: {
       "Content-Type": "application/json",
-      "X-API-Key": import.meta.env.VITE_API_KEY || "localfarm-admin-key",
+      "X-API-Key": API || "localfarm-admin-key",
     },
     body: JSON.stringify(formData),
   }
