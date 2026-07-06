@@ -8,7 +8,7 @@ import {
 } from "react-icons/fa";
 
 const API = import.meta.env.VITE_API_URL;
-const API_KEY = "zxcvnmlkjhgfdsa";  
+const API_KEY = import.meta.env.VITE_API_KEY || "";
 
 function Contact() {
 
@@ -28,41 +28,45 @@ function Contact() {
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
-
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
-
   };
 
   const handleSubmit = async (e) => {
-
     e.preventDefault();
-
     setLoading(true);
-  
-    try {
 
-      
-     const response = await fetch(
-      `${API}/contacts`,
-      {
+    try {
+      const headers = {
+        "Content-Type": "application/json",
+      };
+
+      if (API_KEY) {
+        headers["X-API-Key"] = API_KEY;
+      }
+
+      const response = await fetch(`${API}/contacts`, {
         method: "POST",
         mode: "cors",
-        headers: {
-          "Content-Type": "application/json",
-          "X-API-Key": API_KEY,
-        },
+        headers,
         body: JSON.stringify(formData),
+      });
+
+      const text = await response.text();
+      let data = null;
+      try {
+        data = JSON.parse(text);
+      } catch (parseError) {
+        console.error("Failed to parse contact response:", text, parseError);
       }
-    );
 
-      const data = await response.json();
-
-      if (data.status) {
+      if (!response.ok) {
+        const message = data?.message || `Server Error ${response.status}`;
+        alert(message);
+      } else if (data?.status) {
         alert(data.message || "Message sent successfully!");
-
         setFormData({
           name: "",
           email: "",
@@ -70,19 +74,14 @@ function Contact() {
           message: "",
         });
       } else {
-        alert(data.message || "Something went wrong");
+        alert(data?.message || "Something went wrong");
       }
-
     } catch (error) {
-
-      console.error(error);
-
-      alert("Server Error");
-
+      console.error("Contact submit failed:", error);
+      alert(error?.message || "Server Error");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
-
   };
 
   return (
