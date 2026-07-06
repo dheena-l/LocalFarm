@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from fastapi import BackgroundTasks
 from fastapi import Depends
 
 from sqlalchemy.orm import Session
@@ -16,6 +17,7 @@ router = APIRouter()
 @router.post("/contacts")
 def create_contact(
     contact: ContactSchema,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
 ):
 
@@ -32,14 +34,19 @@ def create_contact(
         db.refresh(new_contact)
     except Exception:
         db.rollback()
-        raise
-    try:
-        send_contact_email(
-            contact.name,
-            contact.email,
-            contact.phone,
-            contact.message
-        )
+        logger.exception("Failed to save contact message for: %s", contact.email)
+        return {
+            "status": False,
+            "message": "Unable to save your message. Please try again later."
+        }
+
+    background_tasks.add_task(
+        send_contact_email,
+        contact.name,
+        contact.email,
+        contact.phone,
+        contact.message,
+    )
     except Exception:
         logger.exception("Failed to send contact email for: %s", contact.email)
         return {
