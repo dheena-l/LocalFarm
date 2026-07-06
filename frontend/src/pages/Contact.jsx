@@ -8,7 +8,7 @@ import {
 } from "react-icons/fa";
 
 const API = import.meta.env.VITE_API_URL;
-const API_KEY = import.meta.env.VITE_API_KEY || "localfarm-admin-key";
+const API_KEY = "zxcvnmlkjhgfdsa";  
 
 function Contact() {
 
@@ -41,11 +41,10 @@ function Contact() {
     e.preventDefault();
 
     setLoading(true);
-   
+  
     try {
 
-      console.log("API URL:", API);
-console.log("API KEY:", API_KEY);
+      
      const response = await fetch(
       `${API}/contacts`,
       {
