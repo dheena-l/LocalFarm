@@ -44,6 +44,8 @@ function Contact() {
   
     try {
 
+      console.log("API URL:", API);
+console.log("API KEY:", API_KEY);
      const response = await fetch(
       `${API}/contacts`,
       {
