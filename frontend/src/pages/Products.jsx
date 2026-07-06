@@ -9,6 +9,8 @@ import {
 } from "react-icons/fa";
 import vegs from '../assets/vegs.jfif'; 
 import { useNavigate } from "react-router-dom";
+const API = import.meta.env.VITE_API_URL;
+
 
 function Products() {
   const navigate = useNavigate();
