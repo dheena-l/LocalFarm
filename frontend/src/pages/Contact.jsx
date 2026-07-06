@@ -61,8 +61,7 @@ function Contact() {
       const data = await response.json();
 
       if (data.status) {
-
-        alert("Message sent successfully!");
+        alert(data.message || "Message sent successfully!");
 
         setFormData({
           name: "",
@@ -70,11 +69,8 @@ function Contact() {
           phone: "",
           message: "",
         });
-
       } else {
-
-        alert("Something went wrong");
-
+        alert(data.message || "Something went wrong");
       }
 
     } catch (error) {

@@ -1,39 +1,18 @@
-import smtplib
-
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-
-from dotenv import load_dotenv
-
 import os
+import resend
 
-load_dotenv()
+resend.api_key = os.getenv("RESEND_API_KEY")
 
-EMAIL_ADDRESS = os.getenv(
-    "EMAIL_ADDRESS"
-)
-
-EMAIL_PASSWORD = os.getenv(
-    "EMAIL_PASSWORD"
-)
+EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")
 
 
-def send_contact_email(
-    name,
-    email,
-    phone,
-    message
-): 
+def send_contact_email(name, email, phone, message):
 
-    msg = MIMEMultipart()
-
-    msg["From"] = EMAIL_ADDRESS
-
-    msg["To"] = EMAIL_ADDRESS
-
-    msg["Subject"] = "New Contact Form"
-
-    body = f"""
+    resend.Emails.send({
+        "from": "Local Farm <onboarding@resend.dev>",
+        "to": "dheenadhayalan201@gmail.com",
+        "subject": "New Contact Form",
+        "text": f"""
 Name: {name}
 
 Email: {email}
@@ -41,26 +20,6 @@ Email: {email}
 Phone: {phone}
 
 Message:
-
 {message}
 """
-
-    msg.attach(
-        MIMEText(body, "plain")
-    )
-
-    server = smtplib.SMTP(
-        "smtp.gmail.com",
-        587
-    )
-
-    server.starttls()
-
-    server.login(
-        EMAIL_ADDRESS,
-        EMAIL_PASSWORD
-    )
-
-    server.send_message(msg)
-
-    server.quit()
+    })
