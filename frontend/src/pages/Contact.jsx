@@ -1,6 +1,5 @@
 import { useState } from "react";
 
-const API = import.meta.env.VITE_API_URL;
 
 import {
   FaFacebookF,
@@ -9,6 +8,8 @@ import {
   FaMapMarkerAlt,
   FaLeaf,
 } from "react-icons/fa";
+const API = import.meta.env.VITE_API_URL;
+
 
 function Contact() {
 

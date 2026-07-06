@@ -9,6 +9,8 @@ import {
   FaStar,
 } from "react-icons/fa";
 const API = import.meta.env.VITE_API_URL;
+const API = import.meta.env.VITE_API_URL;
+
 
 
 function ProductDetails() {
