@@ -142,6 +142,24 @@ function ProductDetails() {
       setLoading(false);
     }
   };
+  const handleBuyNow = () => {
+  const phone = product.phone || "9344420468";
+
+  const message = `Hello,
+
+I would like to buy this product.
+
+Product: ${product.name}
+Price: ₹${product.price}
+Location: ${product.location}
+
+Please contact me regarding this product.`;
+
+  window.open(
+    `https://wa.me/91${phone}?text=${encodeURIComponent(message)}`,
+    "_blank"
+  );
+};
 
   return (
     <div className="container py-5">
@@ -207,16 +225,12 @@ function ProductDetails() {
           {/* BUTTONS */}
           <div className="d-flex gap-3 mt-4">
 
-            <a
-              href={`https://wa.me/91${product.phone || "0000000000"}`}
-              className="btn btn-success px-4 py-2"
-              target="_blank"
-              rel="noreferrer"
-            >
-              <FaWhatsapp className="me-2" />
-              WhatsApp
-            </a>
-
+            <button
+  className="btn btn-dark px-4 py-2"
+  onClick={handleBuyNow}
+>
+  Buy Now
+</button>
             <button
   className="btn btn-dark px-4 py-2"
   onClick={() => {
