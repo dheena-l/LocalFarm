@@ -20,6 +20,7 @@ function ProductDetails() {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [statusMessage, setStatusMessage] = useState({ type: "", text: "" });
+  const [showPopup, setShowPopup] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -216,9 +217,25 @@ function ProductDetails() {
               WhatsApp
             </a>
 
-            <button className="btn btn-dark px-4 py-2">
-              Buy Now
-            </button>
+            <button
+  className="btn btn-dark px-4 py-2"
+  onClick={() => {
+    setShowPopup(true);
+
+    // Hide after 3 seconds
+    setTimeout(() => {
+      setShowPopup(false);
+    }, 3000);
+
+    // Scroll to enquiry form
+    document.getElementById("enquiry-form")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }}
+>
+  Buy Now
+  </button>
 
           </div>
 
@@ -263,7 +280,7 @@ function ProductDetails() {
         {/* CONTACT FORM */}
         <div className="col-lg-4">
 
-          <div className="card border-0 shadow-sm p-4">
+          <div className="card border-0 shadow-sm p-4" id="enquiry-form">
 
             <h4 className="mb-4">
               Enquiry Form
@@ -340,6 +357,18 @@ function ProductDetails() {
         </div>
 
       </div>
+      {showPopup && (
+  <div
+    className="position-fixed top-0 end-0 p-3"
+    style={{ zIndex: 1055 }}
+  >
+    <div className="alert alert-success shadow mb-0">
+      <strong>Buy Now</strong>
+      <br />
+      Please fill out the enquiry form. Our team will contact you shortly.
+    </div>
+  </div>
+)}
 
     </div>
   );
