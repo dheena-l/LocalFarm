@@ -49,10 +49,7 @@ def create_contact(
             contact.message,
         )
     except Exception as exc:
-        return {
-            "status": False,
-            "message": f"Your message was saved, but the email could not be sent: {exc}"
-        }
+        logger.exception("Failed to send contact email for %s", contact.email)
 
     return {
         "status": True,

@@ -7,8 +7,17 @@ from dotenv import load_dotenv
 load_dotenv()
 
 RESEND_API_KEY = os.getenv("RESEND_API_KEY")
-EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS", "dheenadhayalan201@gmail.com")
-FROM_EMAIL = os.getenv("FROM_EMAIL", "onboarding@resend.dev")
+EMAIL_ADDRESS = (
+    os.getenv("EMAIL_ADDRESS")
+    or os.getenv("TO_EMAIL")
+    or os.getenv("RESEND_TO_EMAIL")
+    or "dheenadhayalan201@gmail.com"
+)
+FROM_EMAIL = (
+    os.getenv("FROM_EMAIL")
+    or os.getenv("RESEND_FROM_EMAIL")
+    or "onboarding@resend.dev"
+)
 FROM_NAME = os.getenv("FROM_NAME", "Local Farm")
 
 

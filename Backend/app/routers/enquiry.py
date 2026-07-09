@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter
 from fastapi import Depends
 
@@ -10,6 +12,7 @@ from app.email_service import send_contact_email
 from app.main import require_api_key
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 
 @router.post("/enquiry")
@@ -45,10 +48,7 @@ def create_enquiry(
             enquiry.message,
         )
     except Exception as exc:
-        return {
-            "status": False,
-            "message": f"Your enquiry was saved, but the email could not be sent: {exc}"
-        }
+        logger.exception("Failed to send enquiry email for %s", enquiry.email)
 
     return {
         "status": True,

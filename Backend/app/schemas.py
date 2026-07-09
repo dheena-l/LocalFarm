@@ -25,7 +25,7 @@ class ContactSchema(BaseSecureModel):
     name: Annotated[str, Field(min_length=2, max_length=80)]
     email: EmailStr
     phone: Annotated[str, Field(min_length=10, max_length=10)]
-    message: Annotated[str, Field(min_length=5, max_length=1000)]
+    message: Annotated[str, Field(max_length=1000)]
 
     @field_validator("phone")
     @classmethod
