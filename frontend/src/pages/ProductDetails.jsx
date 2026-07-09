@@ -51,12 +51,21 @@ function ProductDetails() {
     e.preventDefault();
 
     try {
-      await axios.post(`${API}/enquiry`, {
-        product_id: Number(id),
-        name: formData.name,
-        phone: formData.phone,
-        message: formData.message,
-      });
+      await axios.post(
+        `${API}/enquiry`,
+        {
+          product_id: Number(id),
+          name: formData.name,
+          phone: formData.phone,
+          message: formData.message,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "X-API-Key": API_KEY,
+          },
+        }
+      );
 
       alert("Enquiry Submitted Successfully");
       setFormData({ name: "", phone: "", message: "" });
