@@ -248,7 +248,7 @@ Please contact me regarding this product.`;
     });
   }}
 >
-  Buy Now
+  Contact Seller
   </button>
 
           </div>
