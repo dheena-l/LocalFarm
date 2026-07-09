@@ -17,9 +17,12 @@ function ProductDetails() {
   const { id } = useParams();
 
   const [product, setProduct] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
 
   const [formData, setFormData] = useState({
     name: "",
+    email: "",
     phone: "",
     message: "",
   });
@@ -36,10 +39,42 @@ function ProductDetails() {
   }, [id]);
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
+
+    if (errors[name]) {
+      setErrors({ ...errors, [name]: "" });
+    }
+  };
+
+  const validateForm = () => {
+    const validationErrors = {};
+
+    if (!formData.name.trim()) {
+      validationErrors.name = "Name is required";
+    }
+
+    if (!formData.email.trim()) {
+      validationErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      validationErrors.email = "Enter a valid email address";
+    }
+
+    if (!formData.phone.trim()) {
+      validationErrors.phone = "Phone number is required";
+    } else if (!/^\d{10}$/.test(formData.phone)) {
+      validationErrors.phone = "Phone number must be exactly 10 digits";
+    }
+
+    if (!formData.message.trim()) {
+      validationErrors.message = "Message is required";
+    }
+
+    setErrors(validationErrors);
+    return Object.keys(validationErrors).length === 0;
   };
 
   const imagePath = product.image ? String(product.image).replace(/^uploads\//, "") : "";
@@ -50,28 +85,57 @@ function ProductDetails() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    try {
-      await axios.post(
-        `${API}/enquiry`,
-        {
-          product_id: Number(id),
-          name: formData.name,
-          phone: formData.phone,
-          message: formData.message,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "X-API-Key": API_KEY,
-          },
-        }
-      );
+    if (!validateForm()) {
+      return;
+    }
 
-      alert("Enquiry Submitted Successfully");
-      setFormData({ name: "", phone: "", message: "" });
+    setLoading(true);
+
+    try {
+      const headers = {
+        "Content-Type": "application/json",
+      };
+
+      if (API_KEY) {
+        headers["X-API-Key"] = API_KEY;
+      }
+
+      const response = await fetch(`${API}/enquiry`, {
+        method: "POST",
+        mode: "cors",
+        headers,
+        body: JSON.stringify({
+          product_id: Number(id),
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          phone: formData.phone.trim(),
+          message: formData.message.trim(),
+        }),
+      });
+
+      const text = await response.text();
+      let data = null;
+      try {
+        data = JSON.parse(text);
+      } catch (parseError) {
+        console.error("Failed to parse enquiry response:", text, parseError);
+      }
+
+      if (!response.ok) {
+        const message = data?.message || `Server Error ${response.status}`;
+        alert(message);
+      } else if (data?.status) {
+        alert(data.message || "Enquiry Submitted Successfully");
+        setFormData({ name: "", email: "", phone: "", message: "" });
+        setErrors({});
+      } else {
+        alert(data?.message || "Failed to submit enquiry");
+      }
     } catch (error) {
       console.error(error);
-      alert("Failed to submit enquiry");
+      alert(error?.message || "Server Error");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -205,48 +269,59 @@ function ProductDetails() {
             <form onSubmit={handleSubmit}>
 
               <div className="mb-3">
-
                 <input
                   type="text"
                   name="name"
                   placeholder="Your Name"
-                  className="form-control"
+                  className={`form-control${errors.name ? " is-invalid" : ""}`}
+                  value={formData.name}
                   onChange={handleChange}
-                  required
                 />
-
+                {errors.name && <div className="invalid-feedback d-block">{errors.name}</div>}
               </div>
 
               <div className="mb-3">
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Your Email"
+                  className={`form-control${errors.email ? " is-invalid" : ""}`}
+                  value={formData.email}
+                  onChange={handleChange}
+                />
+                {errors.email && <div className="invalid-feedback d-block">{errors.email}</div>}
+              </div>
 
+              <div className="mb-3">
                 <input
                   type="text"
                   name="phone"
                   placeholder="Phone Number"
-                  className="form-control"
+                  className={`form-control${errors.phone ? " is-invalid" : ""}`}
+                  value={formData.phone}
                   onChange={handleChange}
-                  required
                 />
-
+                {errors.phone && <div className="invalid-feedback d-block">{errors.phone}</div>}
               </div>
 
               <div className="mb-3">
-
                 <textarea
                   name="message"
                   rows="4"
                   placeholder="Your Message"
-                  className="form-control"
+                  className={`form-control${errors.message ? " is-invalid" : ""}`}
+                  value={formData.message}
                   onChange={handleChange}
                 ></textarea>
-
+                {errors.message && <div className="invalid-feedback d-block">{errors.message}</div>}
               </div>
 
               <button
                 type="submit"
                 className="btn btn-success w-100"
+                disabled={loading}
               >
-                Send Enquiry
+                {loading ? "Sending..." : "Send Enquiry"}
               </button>
 
             </form>
