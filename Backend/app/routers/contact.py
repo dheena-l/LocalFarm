@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+﻿from fastapi import APIRouter
 from fastapi import BackgroundTasks
 from fastapi import Depends
 
@@ -25,7 +25,7 @@ def create_contact(
         name=contact.name,
         email=contact.email,
         phone=contact.phone,
-        message=contact.message
+        message=contact.message,
     )
 
     try:
@@ -47,14 +47,8 @@ def create_contact(
         contact.phone,
         contact.message,
     )
-    except Exception:
-        logger.exception("Failed to send contact email for: %s", contact.email)
-        return {
-            "status": False,
-            "message": "Failed to send email. Please try again later."
-        }
 
     return {
         "status": True,
-        "message": "Message sent"
+        "message": "Message saved successfully. We will notify you shortly."
     }

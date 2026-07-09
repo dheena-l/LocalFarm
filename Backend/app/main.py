@@ -20,9 +20,12 @@ API_KEY = os.getenv("LOCALFARM_API_KEY") or os.getenv("VITE_API_KEY") or "localf
 FALLBACK_API_KEY = os.getenv("FRONTEND_API_KEY_FALLBACK", "localfarm-admin-key")
 
 # Configure logging for API key diagnostics
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(name)s - %(message)s"
+)
+
 logger = logging.getLogger(__name__)
-if not logger.handlers:
-    logging.basicConfig(level=logging.INFO)
 
 
 def require_api_key(x_api_key: str | None = Header(default=None)):
