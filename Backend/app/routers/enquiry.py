@@ -1,5 +1,4 @@
 from fastapi import APIRouter
-from fastapi import BackgroundTasks
 from fastapi import Depends
 
 from sqlalchemy.orm import Session
@@ -16,7 +15,6 @@ router = APIRouter()
 @router.post("/enquiry")
 def create_enquiry(
     enquiry: EnquirySchema,
-    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     _: str = Depends(require_api_key),
 ):
@@ -39,13 +37,18 @@ def create_enquiry(
             "message": "Unable to save your enquiry. Please try again later."
         }
 
-    background_tasks.add_task(
-        send_contact_email,
-        enquiry.name,
-        enquiry.email,
-        enquiry.phone,
-        enquiry.message,
-    )
+    try:
+        send_contact_email(
+            enquiry.name,
+            enquiry.email,
+            enquiry.phone,
+            enquiry.message,
+        )
+    except Exception as exc:
+        return {
+            "status": False,
+            "message": f"Your enquiry was saved, but the email could not be sent: {exc}"
+        }
 
     return {
         "status": True,

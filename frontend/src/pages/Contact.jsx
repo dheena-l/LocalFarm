@@ -8,7 +8,7 @@ import {
 } from "react-icons/fa";
 
 const API = import.meta.env.VITE_API_URL;
-const API_KEY = import.meta.env.VITE_API_KEY || "";
+const API_KEY = import.meta.env.VITE_API_KEY || "localfarm-admin-key";
 
 function Contact() {
 
@@ -26,17 +26,58 @@ function Contact() {
   });
 
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [statusMessage, setStatusMessage] = useState({ type: "", text: "" });
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
+
+    if (errors[name]) {
+      setErrors({ ...errors, [name]: "" });
+    }
+  };
+
+  const validateForm = () => {
+    const validationErrors = {};
+
+    if (!formData.name.trim()) {
+      validationErrors.name = "Name is required";
+    }
+
+    if (!formData.email.trim()) {
+      validationErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      validationErrors.email = "Enter a valid email address";
+    }
+
+    if (!formData.phone.trim()) {
+      validationErrors.phone = "Phone number is required";
+    } else if (!/^\d{10}$/.test(formData.phone)) {
+      validationErrors.phone = "Phone number must be exactly 10 digits";
+    }
+
+    if (!formData.message.trim()) {
+      validationErrors.message = "Message is required";
+    }
+
+    setErrors(validationErrors);
+    return Object.keys(validationErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!validateForm()) {
+      setStatusMessage({ type: "error", text: "Please fix the highlighted fields and try again." });
+      return;
+    }
+
     setLoading(true);
+    setStatusMessage({ type: "", text: "" });
 
     try {
       const headers = {
@@ -47,11 +88,16 @@ function Contact() {
         headers["X-API-Key"] = API_KEY;
       }
 
-      const response = await fetch(`${API}/contacts`, {
+      const response = await fetch(`${API}/contact`, {
         method: "POST",
         mode: "cors",
         headers,
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          phone: formData.phone.trim(),
+          message: formData.message.trim(),
+        }),
       });
 
       const text = await response.text();
@@ -64,21 +110,22 @@ function Contact() {
 
       if (!response.ok) {
         const message = data?.message || `Server Error ${response.status}`;
-        alert(message);
+        setStatusMessage({ type: "error", text: message });
       } else if (data?.status) {
-        alert(data.message || "Message sent successfully!");
+        setStatusMessage({ type: "success", text: data.message || "Message sent successfully!" });
         setFormData({
           name: "",
           email: "",
           phone: "",
           message: "",
         });
+        setErrors({});
       } else {
-        alert(data?.message || "Something went wrong");
+        setStatusMessage({ type: "error", text: data?.message || "Something went wrong" });
       }
     } catch (error) {
       console.error("Contact submit failed:", error);
-      alert(error?.message || "Server Error");
+      setStatusMessage({ type: "error", text: error?.message || "Server Error" });
     } finally {
       setLoading(false);
     }
@@ -231,10 +278,10 @@ function Contact() {
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
-                      className="form-control custom-input"
+                      className={`form-control custom-input${errors.name ? " is-invalid" : ""}`}
                       placeholder="Enter your name"
-                      required
                     />
+                    {errors.name && <div className="invalid-feedback d-block">{errors.name}</div>}
 
                   </div>
 
@@ -251,10 +298,10 @@ function Contact() {
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
-                      className="form-control custom-input"
+                      className={`form-control custom-input${errors.email ? " is-invalid" : ""}`}
                       placeholder="Enter your email"
-                      required
                     />
+                    {errors.email && <div className="invalid-feedback d-block">{errors.email}</div>}
 
                   </div>
 
@@ -273,9 +320,10 @@ function Contact() {
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
-                    className="form-control custom-input"
+                    className={`form-control custom-input${errors.phone ? " is-invalid" : ""}`}
                     placeholder="Enter your phone number"
                   />
+                  {errors.phone && <div className="invalid-feedback d-block">{errors.phone}</div>}
 
                 </div>
 
@@ -292,10 +340,10 @@ function Contact() {
                     name="message"
                     value={formData.message}
                     onChange={handleChange}
-                    className="form-control custom-input"
+                    className={`form-control custom-input${errors.message ? " is-invalid" : ""}`}
                     placeholder="Write your message here..."
-                    required
                   ></textarea>
+                  {errors.message && <div className="invalid-feedback d-block">{errors.message}</div>}
 
                 </div>
 
@@ -306,10 +354,14 @@ function Contact() {
                   className="submit-btn"
                   disabled={loading}
                 >
-
                   {loading ? "Sending..." : "Send Message"}
-
                 </button>
+
+                {statusMessage.text && (
+                  <div className={`mt-3 small ${statusMessage.type === "success" ? "text-success" : "text-danger"}`}>
+                    {statusMessage.text}
+                  </div>
+                )}
 
               </form>
 

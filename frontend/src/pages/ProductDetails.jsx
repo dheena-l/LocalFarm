@@ -19,6 +19,7 @@ function ProductDetails() {
   const [product, setProduct] = useState({});
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [statusMessage, setStatusMessage] = useState({ type: "", text: "" });
 
   const [formData, setFormData] = useState({
     name: "",
@@ -86,10 +87,12 @@ function ProductDetails() {
     e.preventDefault();
 
     if (!validateForm()) {
+      setStatusMessage({ type: "error", text: "Please fix the highlighted fields and try again." });
       return;
     }
 
     setLoading(true);
+    setStatusMessage({ type: "", text: "" });
 
     try {
       const headers = {
@@ -123,17 +126,17 @@ function ProductDetails() {
 
       if (!response.ok) {
         const message = data?.message || `Server Error ${response.status}`;
-        alert(message);
+        setStatusMessage({ type: "error", text: message });
       } else if (data?.status) {
-        alert(data.message || "Enquiry Submitted Successfully");
+        setStatusMessage({ type: "success", text: data.message || "Enquiry Submitted Successfully" });
         setFormData({ name: "", email: "", phone: "", message: "" });
         setErrors({});
       } else {
-        alert(data?.message || "Failed to submit enquiry");
+        setStatusMessage({ type: "error", text: data?.message || "Failed to submit enquiry" });
       }
     } catch (error) {
       console.error(error);
-      alert(error?.message || "Server Error");
+      setStatusMessage({ type: "error", text: error?.message || "Server Error" });
     } finally {
       setLoading(false);
     }
@@ -323,6 +326,12 @@ function ProductDetails() {
               >
                 {loading ? "Sending..." : "Send Enquiry"}
               </button>
+
+              {statusMessage.text && (
+                <div className={`mt-3 small ${statusMessage.type === "success" ? "text-success" : "text-danger"}`}>
+                  {statusMessage.text}
+                </div>
+              )}
 
             </form>
 
