@@ -50,6 +50,10 @@ def create_contact(
         )
     except Exception as exc:
         logger.exception("Failed to send contact email for %s", contact.email)
+        return {
+            "status": True,
+            "message": f"Message saved successfully, but email delivery failed: {exc}"
+        }
 
     return {
         "status": True,
