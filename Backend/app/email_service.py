@@ -1,7 +1,5 @@
-import json
 import os
-from urllib import error, request
-
+import resend
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -16,46 +14,39 @@ EMAIL_ADDRESS = (
 FROM_EMAIL = (
     os.getenv("FROM_EMAIL")
     or os.getenv("RESEND_FROM_EMAIL")
-    or "onboarding@resend.dev"
+    or "noreply@resend.dev"
 )
 FROM_NAME = os.getenv("FROM_NAME", "Local Farm")
+
+# Set Resend API key
+resend.api_key = RESEND_API_KEY
 
 
 def send_contact_email(name, email, phone, message):
     if not RESEND_API_KEY:
         raise RuntimeError("RESEND_API_KEY is not configured")
 
-    payload = {
-        "from": f"{FROM_NAME} <{FROM_EMAIL}>",
-        "to": [EMAIL_ADDRESS],
-        "subject": "New Contact Form",
-        "text": f"""
-Name: {name}
-
-Email: {email}
-
-Phone: {phone}
-
-Message:
-{message}
-""",
-    }
-
-    req = request.Request(
-        "https://api.resend.com/emails",
-        data=json.dumps(payload).encode("utf-8"),
-        headers={
-            "Authorization": f"Bearer {RESEND_API_KEY}",
-            "Content-Type": "application/json",
-        },
-        method="POST",
-    )
+    html_content = f"""
+    <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+        <h2>New Contact Form Submission</h2>
+        <p><strong>Name:</strong> {name}</p>
+        <p><strong>Email:</strong> {email}</p>
+        <p><strong>Phone:</strong> {phone}</p>
+        <hr />
+        <h3>Message:</h3>
+        <p>{message.replace(chr(10), '<br>')}</p>
+    </div>
+    """
 
     try:
-        with request.urlopen(req, timeout=20) as response:
-            response.read()
-    except error.HTTPError as exc:
-        body = exc.read().decode("utf-8", errors="ignore")
-        raise RuntimeError(f"Resend API rejected the request: {body}") from exc
+        params = {
+            "from": f"{FROM_NAME} <{FROM_EMAIL}>",
+            "to": [EMAIL_ADDRESS],
+            "subject": f"New Contact Form Submission from {name}",
+            "html": html_content,
+        }
+        
+        email_response = resend.Emails.send(params)
+        return email_response
     except Exception as exc:
         raise RuntimeError(f"Failed to send email: {exc}") from exc
