@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import Enquiry
 from app.schemas import EnquirySchema
-from app.email_service import send_contact_email
+from app.email_service import send_enquiry_email
 from app.main import require_api_key
 
 router = APIRouter()
@@ -41,7 +41,8 @@ def create_enquiry(
         }
 
     try:
-        send_contact_email(
+        send_enquiry_email(
+            enquiry.product_id,
             enquiry.name,
             enquiry.email,
             enquiry.phone,
