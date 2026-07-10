@@ -193,8 +193,6 @@ function Contact() {
                   <h5>Farm Address</h5>
 
                   <p>
-                    Paramankeni,
-                    <br />
                     Cheyyur,
                     <br />
                     Chengalpattu - 603305,

@@ -20,7 +20,7 @@ function Footer() {
             
             <div className="mt-4 mt-md-5">
               <p className="text-muted small mb-0">
-                &copy; {new Date().getFullYear()} LFH. All rights reserved.
+                &copy; {new Date().getFullYear()} LF. All rights reserved.
               </p>
             </div>
           </div>
