@@ -1,8 +1,11 @@
 import os
-import resend
-from dotenv import load_dotenv
+from html import escape
 
-load_dotenv()
+import resend
+
+from app.config import load_backend_env
+
+load_backend_env()
 
 RESEND_API_KEY = os.getenv("RESEND_API_KEY")
 EMAIL_ADDRESS = (
@@ -26,15 +29,21 @@ def send_contact_email(name, email, phone, message):
     if not RESEND_API_KEY:
         raise RuntimeError("RESEND_API_KEY is not configured")
 
+    safe_name = escape(name)
+    safe_email = escape(email)
+    safe_phone = escape(phone)
+    safe_message = escape(message).replace("\n", "<br>")
+    subject_name = " ".join(name.split())
+
     html_content = f"""
     <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
         <h2>New Contact Form Submission</h2>
-        <p><strong>Name:</strong> {name}</p>
-        <p><strong>Email:</strong> {email}</p>
-        <p><strong>Phone:</strong> {phone}</p>
+        <p><strong>Name:</strong> {safe_name}</p>
+        <p><strong>Email:</strong> {safe_email}</p>
+        <p><strong>Phone:</strong> {safe_phone}</p>
         <hr />
         <h3>Message:</h3>
-        <p>{message.replace(chr(10), '<br>')}</p>
+        <p>{safe_message}</p>
     </div>
     """
 
@@ -42,8 +51,9 @@ def send_contact_email(name, email, phone, message):
         params = {
             "from": f"{FROM_NAME} <{FROM_EMAIL}>",
             "to": [EMAIL_ADDRESS],
-            "subject": f"New Contact Form Submission from {name}",
+            "subject": f"New Contact Form Submission from {subject_name}",
             "html": html_content,
+            "reply_to": email,
         }
         
         email_response = resend.Emails.send(params)

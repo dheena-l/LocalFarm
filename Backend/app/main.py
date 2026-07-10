@@ -1,12 +1,12 @@
 import os
 from pathlib import Path
 
-from dotenv import load_dotenv
 from fastapi import FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import logging
 
+from app.config import load_backend_env
 from app.database import Base
 from app.database import engine
 
@@ -14,7 +14,7 @@ Base.metadata.create_all(
     bind=engine
 )
 
-load_dotenv()
+load_backend_env()
 
 API_KEY = os.getenv("LOCALFARM_API_KEY") or os.getenv("VITE_API_KEY") or "localfarm-admin-key"
 FALLBACK_API_KEY = os.getenv("FRONTEND_API_KEY_FALLBACK", "localfarm-admin-key")

@@ -50,7 +50,7 @@ def create_enquiry(
     except Exception as exc:
         logger.exception("Failed to send enquiry email for %s", enquiry.email)
         return {
-            "status": True,
+            "status": False,
             "message": f"Enquiry saved successfully, but email delivery failed: {exc}"
         }
 
