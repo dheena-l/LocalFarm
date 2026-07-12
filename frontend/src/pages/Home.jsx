@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
-
-const API = import.meta.env.VITE_API_URL;
 import ProductCard from '../components/ProductCard';
+import { fetchProducts, getInitialProducts } from '../utils/productsApi';
 
 import farmHeroImage from '../assets/farm.jpg';
 
@@ -14,11 +12,11 @@ import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 
 function Home() {
-    const [products, setProducts] = useState([]);
+    const [products, setProducts] = useState(getInitialProducts);
 
     useEffect(() => {
-      axios.get(`${API}/products`)
-        .then((response) => setProducts(response.data))
+      fetchProducts()
+        .then(setProducts)
         .catch((error) => console.error(error));
     }, []);
 

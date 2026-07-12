@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { useParams } from "react-router-dom";
 import {
   FaMapMarkerAlt,
@@ -8,6 +7,7 @@ import {
   FaTruck,
   FaStar,
 } from "react-icons/fa";
+import { fetchProductById, getInitialProducts, getProductImageUrl } from "../utils/productsApi";
 const API = import.meta.env.VITE_API_URL;
 const API_KEY = import.meta.env.VITE_API_KEY || "localfarm-admin-key";
 
@@ -16,7 +16,9 @@ const API_KEY = import.meta.env.VITE_API_KEY || "localfarm-admin-key";
 function ProductDetails() {
   const { id } = useParams();
 
-  const [product, setProduct] = useState({});
+  const [product, setProduct] = useState(
+    () => getInitialProducts().find((item) => item.id === Number(id)) || {}
+  );
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [statusMessage, setStatusMessage] = useState({ type: "", text: "" });
@@ -30,10 +32,11 @@ function ProductDetails() {
   });
 
   useEffect(() => {
-    axios
-      .get(`${API}/products/${id}`)
-      .then((response) => {
-        setProduct(response.data);
+    fetchProductById(id)
+      .then((data) => {
+        if (data) {
+          setProduct(data);
+        }
       })
       .catch((error) => {
         console.log(error);
@@ -79,10 +82,7 @@ function ProductDetails() {
     return Object.keys(validationErrors).length === 0;
   };
 
-  const imagePath = product.image ? String(product.image).replace(/^uploads\//, "") : "";
-  const imageUrl = imagePath
-    ? `${API}/uploads/${imagePath}`
-    : "";
+  const imageUrl = getProductImageUrl(product.image);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

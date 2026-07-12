@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { motion } from "framer-motion";
 import {
   FaLeaf,
@@ -9,16 +8,16 @@ import {
 } from "react-icons/fa";
 import vegs from '../assets/vegs.jfif'; 
 import { useNavigate } from "react-router-dom";
-const API = import.meta.env.VITE_API_URL;
+import { fetchProducts, getInitialProducts, getProductImageUrl } from "../utils/productsApi";
 
 function Products() {
   const navigate = useNavigate();
 
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState(getInitialProducts);
 
   useEffect(() => {
-    axios.get(`${API}/products`)
-      .then((response) => setProducts(response.data))
+    fetchProducts()
+      .then(setProducts)
       .catch((error) => console.error(error));
   }, []);
 
@@ -179,7 +178,7 @@ function Products() {
                   <div className="product-image-wrapper">
 
                     <img
-                      src={item.image ? `${API}/uploads/${String(item.image).replace(/^uploads\//, "")}` : vegs}
+                      src={getProductImageUrl(item.image, vegs)}
                       alt={item.name}
                       className="product-list-image"
                     />

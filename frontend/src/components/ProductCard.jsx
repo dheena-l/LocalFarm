@@ -1,12 +1,11 @@
 import { Link } from 'react-router-dom';
-
-const API = import.meta.env.VITE_API_URL;
+import { getProductImageUrl } from '../utils/productsApi';
 
 function ProductCard({ item }) {
-  const imagePath = item.image ? String(item.image).replace(/^uploads\//, "") : "";
-  const imageUrl = imagePath
-    ? `${API}/uploads/${imagePath}`
-    : 'https://via.placeholder.com/300x250?text=Farm+Product';
+  const imageUrl = getProductImageUrl(
+    item.image,
+    'https://via.placeholder.com/300x250?text=Farm+Product'
+  );
 
   return (
 

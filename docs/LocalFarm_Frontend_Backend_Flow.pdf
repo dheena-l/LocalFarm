@@ -1,0 +1,352 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>
+endobj
+2 0 obj
+<< /Length 3110 >>
+stream
+BT
+/F1 10 Tf
+54 742 Td
+(LocalFarm Application Flow) Tj
+0 -14 Td (Frontend + Backend Structure and Code Explanation) Tj
+0 -14 Td () Tj
+0 -14 Td (This PDF explains how the React frontend talks to the FastAPI backend,) Tj
+0 -14 Td (how products are displayed, how Contact Us and Enquiry forms are saved,) Tj
+0 -14 Td (and how Resend sends email notifications.) Tj
+0 -14 Td () Tj
+0 -14 Td (1. High Level Architecture) Tj
+0 -14 Td () Tj
+0 -14 Td (+------------------+        HTTP / JSON / FormData        +------------------+) Tj
+0 -14 Td (| React Frontend   | ------------------------------------> | FastAPI Backend  |) Tj
+0 -14 Td (| frontend/src     |                                       | Backend/app      |) Tj
+0 -14 Td (+------------------+                                       +---------+--------+) Tj
+0 -14 Td (        |                                                            |) Tj
+0 -14 Td (        | VITE_API_URL                                                | SQLAlchemy) Tj
+0 -14 Td (        v                                                            v) Tj
+0 -14 Td (+------------------+                                       +------------------+) Tj
+0 -14 Td (| Browser Pages    |                                       | Database Tables  |) Tj
+0 -14 Td (| Home, Products,  |                                       | products,        |) Tj
+0 -14 Td (| ProductDetails,  |                                       | contacts,        |) Tj
+0 -14 Td (| Contact, Admin   |                                       | enquiries        |) Tj
+0 -14 Td (+------------------+                                       +---------+--------+) Tj
+0 -14 Td (                                                                     |) Tj
+0 -14 Td (                                                                     | Resend SDK) Tj
+0 -14 Td (                                                                     v) Tj
+0 -14 Td (                                                          +------------------+) Tj
+0 -14 Td (                                                          | Email Inbox      |) Tj
+0 -14 Td (                                                          +------------------+) Tj
+0 -14 Td () Tj
+0 -14 Td (The frontend is a Vite React app. It reads the backend base URL from VITE_API_URL. The) Tj
+0 -14 Td (backend is a FastAPI app. It exposes product, contact, and enquiry endpoints, stores) Tj
+0 -14 Td (records through SQLAlchemy, serves uploaded images from /uploads, and sends email) Tj
+0 -14 Td (through Resend.) Tj
+0 -14 Td () Tj
+0 -14 Td (2. Frontend Route Structure) Tj
+0 -14 Td () Tj
+0 -14 Td (frontend/src/App.jsx) Tj
+0 -14 Td () Tj
+0 -14 Td (/                    -> Home.jsx) Tj
+0 -14 Td (/products            -> Products.jsx) Tj
+0 -14 Td (/product/:id         -> ProductDetails.jsx) Tj
+0 -14 Td (/about               -> About.jsx) Tj
+0 -14 Td (/contact             -> Contact.jsx) Tj
+0 -14 Td (/admin               -> Login.jsx) Tj
+0 -14 Td (/admin/dashboard     -> Dashboard.jsx) Tj
+0 -14 Td (/admin/add-product   -> AddProduct.jsx) Tj
+0 -14 Td () Tj
+0 -14 Td (3. Backend Route Structure) Tj
+ET
+endstream
+endobj
+3 0 obj
+<< /Type /Page /Parent 14 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R >> >> /Contents 2 0 R >>
+endobj
+4 0 obj
+<< /Length 2418 >>
+stream
+BT
+/F1 10 Tf
+54 742 Td
+() Tj
+0 -14 Td (Backend/app/main.py creates FastAPI app and includes routers:) Tj
+0 -14 Td () Tj
+0 -14 Td (GET  /products             -> list products) Tj
+0 -14 Td (GET  /products/{id}        -> get one product) Tj
+0 -14 Td (POST /products             -> create product, requires X-API-Key) Tj
+0 -14 Td (POST /products/bulk        -> create many products, requires X-API-Key) Tj
+0 -14 Td (POST /contact or /contacts -> save contact + send contact mail) Tj
+0 -14 Td (POST /enquiry              -> save enquiry + send enquiry mail) Tj
+0 -14 Td (GET  /uploads/{file}       -> static uploaded product images) Tj
+0 -14 Td () Tj
+0 -14 Td (4. Product Listing Flow) Tj
+0 -14 Td () Tj
+0 -14 Td (+------------------+) Tj
+0 -14 Td (| User opens       |) Tj
+0 -14 Td (| /products        |) Tj
+0 -14 Td (+--------+---------+) Tj
+0 -14 Td (         |) Tj
+0 -14 Td (         v) Tj
+0 -14 Td (+------------------+      GET /products       +------------------+) Tj
+0 -14 Td (| Products.jsx     | -----------------------> | products.py      |) Tj
+0 -14 Td (| axios.get        |                          | get_products     |) Tj
+0 -14 Td (+--------+---------+                          +--------+---------+) Tj
+0 -14 Td (         |                                             |) Tj
+0 -14 Td (         |                                             v) Tj
+0 -14 Td (         |                                  +------------------+) Tj
+0 -14 Td (         |                                  | products table   |) Tj
+0 -14 Td (         |                                  +------------------+) Tj
+0 -14 Td (         |) Tj
+0 -14 Td (         v) Tj
+0 -14 Td (+------------------+) Tj
+0 -14 Td (| Product cards    |) Tj
+0 -14 Td (| image from       |) Tj
+0 -14 Td (| /uploads/name    |) Tj
+0 -14 Td (+------------------+) Tj
+0 -14 Td () Tj
+0 -14 Td (Products.jsx loads all products with axios.get\(`${API}/products`\). The backend queries) Tj
+0 -14 Td (the Product table, normalizes image names, and returns a JSON list. The frontend maps) Tj
+0 -14 Td (that list into product cards. Images are loaded from `${API}/uploads/<image-name>`.) Tj
+0 -14 Td () Tj
+0 -14 Td (5. Product Detail + Enquiry Flow) Tj
+0 -14 Td () Tj
+0 -14 Td (+---------------------+) Tj
+0 -14 Td (| User opens          |) Tj
+0 -14 Td (| /product/:id        |) Tj
+0 -14 Td (+----------+----------+) Tj
+0 -14 Td (           |) Tj
+0 -14 Td (           v) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 14 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R >> >> /Contents 4 0 R >>
+endobj
+6 0 obj
+<< /Length 3256 >>
+stream
+BT
+/F1 10 Tf
+54 742 Td
+(+---------------------+     GET /products/{id}     +------------------+) Tj
+0 -14 Td (| ProductDetails.jsx  | -------------------------> | products.py      |) Tj
+0 -14 Td (+----------+----------+                            +------------------+) Tj
+0 -14 Td (           |) Tj
+0 -14 Td (           | User submits enquiry form) Tj
+0 -14 Td (           v) Tj
+0 -14 Td (+---------------------+     POST /enquiry          +------------------+) Tj
+0 -14 Td (| fetch JSON body     | -------------------------> | enquiry.py       |) Tj
+0 -14 Td (| X-API-Key header    |                            +--------+---------+) Tj
+0 -14 Td (+---------------------+                                     |) Tj
+0 -14 Td (                                                            v) Tj
+0 -14 Td (                                                 +---------------------+) Tj
+0 -14 Td (                                                 | save Enquiry record |) Tj
+0 -14 Td (                                                 +----------+----------+) Tj
+0 -14 Td (                                                            |) Tj
+0 -14 Td (                                                            v) Tj
+0 -14 Td (                                                 +---------------------+) Tj
+0 -14 Td (                                                 | send_enquiry_email  |) Tj
+0 -14 Td (                                                 | Resend.Emails.send  |) Tj
+0 -14 Td (                                                 +---------------------+) Tj
+0 -14 Td () Tj
+0 -14 Td (ProductDetails.jsx first loads the product using the route id. When the enquiry form) Tj
+0 -14 Td (is submitted, it validates name, email, phone, and message, then sends JSON to POST) Tj
+0 -14 Td (/enquiry with X-API-Key. The backend saves the enquiry in the database and calls) Tj
+0 -14 Td (send_enquiry_email\(product_id, name, email, phone, message\).) Tj
+0 -14 Td () Tj
+0 -14 Td (6. Contact Us Flow) Tj
+0 -14 Td () Tj
+0 -14 Td (+------------------+) Tj
+0 -14 Td (| User opens       |) Tj
+0 -14 Td (| /contact         |) Tj
+0 -14 Td (+--------+---------+) Tj
+0 -14 Td (         |) Tj
+0 -14 Td (         | fills Contact.jsx form) Tj
+0 -14 Td (         v) Tj
+0 -14 Td (+------------------+      POST /contact       +------------------+) Tj
+0 -14 Td (| fetch JSON body  | -----------------------> | contact.py       |) Tj
+0 -14 Td (| X-API-Key header |                          +--------+---------+) Tj
+0 -14 Td (+------------------+                                   |) Tj
+0 -14 Td (                                                       v) Tj
+0 -14 Td (                                            +---------------------+) Tj
+0 -14 Td (                                            | save Contact record |) Tj
+0 -14 Td (                                            +----------+----------+) Tj
+0 -14 Td (                                                       |) Tj
+0 -14 Td (                                                       v) Tj
+0 -14 Td (                                            +---------------------+) Tj
+0 -14 Td (                                            | send_contact_email  |) Tj
+0 -14 Td (                                            | Resend.Emails.send  |) Tj
+ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 14 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R >> >> /Contents 6 0 R >>
+endobj
+8 0 obj
+<< /Length 2783 >>
+stream
+BT
+/F1 10 Tf
+54 742 Td
+(                                            +---------------------+) Tj
+0 -14 Td () Tj
+0 -14 Td (Contact.jsx validates the contact form and sends name, email, phone, and message to) Tj
+0 -14 Td (POST /contact. contact.py stores the message in the contacts table. Then) Tj
+0 -14 Td (email_service.py builds a Resend params dictionary and sends the notification email.) Tj
+0 -14 Td () Tj
+0 -14 Td (7. Admin Add Product Flow) Tj
+0 -14 Td () Tj
+0 -14 Td (+---------------------+) Tj
+0 -14 Td (| Admin opens         |) Tj
+0 -14 Td (| /admin/add-product  |) Tj
+0 -14 Td (+----------+----------+) Tj
+0 -14 Td (           |) Tj
+0 -14 Td (           | fills name, price, category, description, location, image) Tj
+0 -14 Td (           v) Tj
+0 -14 Td (+---------------------+   POST /products FormData   +------------------+) Tj
+0 -14 Td (| AddProduct.jsx      | --------------------------> | products.py      |) Tj
+0 -14 Td (| axios.post          |                             | create_product   |) Tj
+0 -14 Td (| X-API-Key header    |                             +--------+---------+) Tj
+0 -14 Td (+---------------------+                                      |) Tj
+0 -14 Td (                                                             v) Tj
+0 -14 Td (                                                  +---------------------+) Tj
+0 -14 Td (                                                  | validate/save image |) Tj
+0 -14 Td (                                                  | Backend/uploads     |) Tj
+0 -14 Td (                                                  +----------+----------+) Tj
+0 -14 Td (                                                             |) Tj
+0 -14 Td (                                                             v) Tj
+0 -14 Td (                                                  +---------------------+) Tj
+0 -14 Td (                                                  | save Product row    |) Tj
+0 -14 Td (                                                  +---------------------+) Tj
+0 -14 Td () Tj
+0 -14 Td (8. Email Service Code Shape) Tj
+0 -14 Td () Tj
+0 -14 Td (Backend/app/email_service.py loads:) Tj
+0 -14 Td () Tj
+0 -14 Td (RESEND_API_KEY -> Resend API key) Tj
+0 -14 Td (FROM_EMAIL     -> sender, currently onboarding@resend.dev for testing) Tj
+0 -14 Td (FROM_NAME      -> display name, Local Farm) Tj
+0 -14 Td (TO_EMAIL       -> receiver email address) Tj
+0 -14 Td () Tj
+0 -14 Td (The send function builds params like:) Tj
+0 -14 Td () Tj
+0 -14 Td (params = {) Tj
+0 -14 Td (  'from': 'Local Farm <onboarding@resend.dev>',) Tj
+0 -14 Td (  'to': ['your-email@gmail.com'],) Tj
+0 -14 Td (  'subject': 'New Contact Us Message from Customer',) Tj
+0 -14 Td (  'html': '<p>...</p>',) Tj
+0 -14 Td (  'reply_to': 'customer@example.com') Tj
+ET
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 14 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R >> >> /Contents 8 0 R >>
+endobj
+10 0 obj
+<< /Length 2207 >>
+stream
+BT
+/F1 10 Tf
+54 742 Td
+(}) Tj
+0 -14 Td () Tj
+0 -14 Td (email = resend.Emails.send\(params\)) Tj
+0 -14 Td () Tj
+0 -14 Td (Important Resend rule: onboarding@resend.dev is only for testing and can send only to) Tj
+0 -14 Td (the email address allowed by your Resend account. To send to any customer or other) Tj
+0 -14 Td (inbox, verify a real domain in Resend and use a sender such as contact@yourdomain.com.) Tj
+0 -14 Td () Tj
+0 -14 Td (9. Backend Database Models) Tj
+0 -14 Td () Tj
+0 -14 Td (Contact table:) Tj
+0 -14 Td (  id, name, email, phone, message) Tj
+0 -14 Td () Tj
+0 -14 Td (Enquiry table:) Tj
+0 -14 Td (  id, product_id, name, phone, message) Tj
+0 -14 Td () Tj
+0 -14 Td (Product table:) Tj
+0 -14 Td (  id, name, price, category, description, location, image) Tj
+0 -14 Td () Tj
+0 -14 Td (10. Environment Variables) Tj
+0 -14 Td () Tj
+0 -14 Td (Frontend .env:) Tj
+0 -14 Td (  VITE_API_URL  -> backend base URL) Tj
+0 -14 Td (  VITE_API_KEY  -> sent as X-API-Key for protected requests) Tj
+0 -14 Td () Tj
+0 -14 Td (Backend .env:) Tj
+0 -14 Td (  DATABASE_URL       -> database connection string) Tj
+0 -14 Td (  LOCALFARM_API_KEY  -> accepted backend API key) Tj
+0 -14 Td (  RESEND_API_KEY     -> Resend key) Tj
+0 -14 Td (  FROM_EMAIL         -> sender address) Tj
+0 -14 Td (  FROM_NAME          -> email display name) Tj
+0 -14 Td (  EMAIL_ADDRESS      -> receiver address) Tj
+0 -14 Td () Tj
+0 -14 Td (11. Request Security) Tj
+0 -14 Td () Tj
+0 -14 Td (require_api_key\(\) in Backend/app/main.py reads the X-API-Key request) Tj
+0 -14 Td (header. Protected endpoints use Depends\(require_api_key\). If the) Tj
+0 -14 Td (header does not match LOCALFARM_API_KEY or fallback key, FastAPI) Tj
+0 -14 Td (returns HTTP 401 Invalid API key.) Tj
+0 -14 Td () Tj
+0 -14 Td (12. Quick Code Reading Guide) Tj
+0 -14 Td () Tj
+0 -14 Td (Start here:) Tj
+0 -14 Td (  frontend/src/App.jsx                 -> page routes) Tj
+0 -14 Td (  frontend/src/pages/Products.jsx      -> product list request) Tj
+0 -14 Td (  frontend/src/pages/ProductDetails.jsx -> detail + enquiry form) Tj
+0 -14 Td (  frontend/src/pages/Contact.jsx       -> contact form) Tj
+0 -14 Td (  frontend/src/admin/AddProduct.jsx    -> admin product upload) Tj
+ET
+endstream
+endobj
+11 0 obj
+<< /Type /Page /Parent 14 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R >> >> /Contents 10 0 R >>
+endobj
+12 0 obj
+<< /Length 469 >>
+stream
+BT
+/F1 10 Tf
+54 742 Td
+(  Backend/app/main.py                  -> FastAPI setup + API key check) Tj
+0 -14 Td (  Backend/app/routers/products.py      -> product API) Tj
+0 -14 Td (  Backend/app/routers/contact.py       -> contact save + mail) Tj
+0 -14 Td (  Backend/app/routers/enquiry.py       -> enquiry save + mail) Tj
+0 -14 Td (  Backend/app/email_service.py         -> Resend mail sender) Tj
+0 -14 Td (  Backend/app/models.py                -> database tables) Tj
+ET
+endstream
+endobj
+13 0 obj
+<< /Type /Page /Parent 14 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R >> >> /Contents 12 0 R >>
+endobj
+14 0 obj
+<< /Type /Pages /Kids [3 0 R 5 0 R 7 0 R 9 0 R 11 0 R 13 0 R] /Count 6 >>
+endobj
+15 0 obj
+<< /Type /Catalog /Pages 14 0 R >>
+endobj
+xref
+0 16
+0000000000 65535 f 
+0000000015 00000 n 
+0000000083 00000 n 
+0000003245 00000 n 
+0000003372 00000 n 
+0000005842 00000 n 
+0000005969 00000 n 
+0000009277 00000 n 
+0000009404 00000 n 
+0000012239 00000 n 
+0000012366 00000 n 
+0000014626 00000 n 
+0000014755 00000 n 
+0000015276 00000 n 
+0000015405 00000 n 
+0000015495 00000 n 
+trailer
+<< /Size 16 /Root 15 0 R >>
+startxref
+15546
+%%EOF
