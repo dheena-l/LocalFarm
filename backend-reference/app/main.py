@@ -1,0 +1,65 @@
+import os
+from pathlib import Path
+
+from fastapi import FastAPI, Header, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+import logging
+
+from app.config import load_backend_env
+from app.database import Base
+from app.database import engine
+
+Base.metadata.create_all( 
+    bind=engine
+)
+
+load_backend_env()
+
+API_KEY = os.getenv("LOCALFARM_API_KEY") or os.getenv("VITE_API_KEY") or "localfarm-admin-key"
+FALLBACK_API_KEY = os.getenv("FRONTEND_API_KEY_FALLBACK", "localfarm-admin-key")
+
+# Configure logging for API key diagnostics
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(name)s - %(message)s"
+)
+
+logger = logging.getLogger(__name__)
+
+
+def require_api_key(x_api_key: str | None = Header(default=None)):
+    logger.info("Received X-API-Key: %s", x_api_key)
+    if x_api_key not in (API_KEY, FALLBACK_API_KEY):
+        raise HTTPException(status_code=401, detail="Invalid API key")
+    return x_api_key
+
+
+app = FastAPI()
+
+from app.routers.contact import router as contact_router
+from app.routers.enquiry import router as enquiry_router
+from app.routers.products import router as products_router
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.include_router(
+    contact_router
+)
+
+app.include_router(
+    enquiry_router
+)
+
+app.include_router(
+    products_router
+)
+
+UPLOAD_DIR = Path(__file__).resolve().parents[1] / "uploads"
+app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
